@@ -1,0 +1,17 @@
+{
+  "name": "slack-sotogarca",
+  "version": "0.0.0",
+  "description": "",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gm": "^1.18.1",
+    "request": "^2.57.0",
+    "ws": "^0.7.2",
+    "node-slack-upload": "^1.0.3"
+  }
+}
