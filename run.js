@@ -2,6 +2,7 @@ var gm = require('gm');
 var fs = require('fs');
 var Slack = require('node-slack-upload');
 path = require('path');
+var garca = require('./garca.js');
 
 console.log("connecting...")
 
@@ -40,7 +41,7 @@ function connectWebSocket(url) {
         gm(__dirname + '/template.png')
         .fontSize(48)
         .fill("#C63026")
-        .drawText(50, 100, message.text.substring(message.text.indexOf(':') + 1))
+        .drawText(50, 100, garca.preProcessText(message.text.substring(message.text.indexOf(':') + 1)))
         .write(outputFileName, function (err) {
           if (err) 
             ws.send(JSON.stringify({ channel: message.channel, id: 1, text: "Error: " + JSON.stringify(err) , type: "message" }));
@@ -67,3 +68,5 @@ function uploadImage(fileName, message) {
         }
     });
 }
+
+
