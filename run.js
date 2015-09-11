@@ -22,6 +22,13 @@ request(authUrl, function(err, response, body) {
   }
 });
 
+var garcaLineLenght = 28
+
+var handlers = {
+  '^sotogarca:.*' : [ 'garca.png', handleGarca ],
+  '^cronica:.*' : ['cronica.png', handleCronica ]
+}
+
 function connectWebSocket(url) {
   var ws = new WebSocket(url);
 
@@ -33,30 +40,52 @@ function connectWebSocket(url) {
       console.log('received:', message);
       message = JSON.parse(message);
 
-      if (message.type === 'message' && message.text != undefined && message.text.match(/^sotogarca:.*/)) {
-	      console.log("received :" + JSON.stringify(message))
+      if (message.type === 'message' && message.text != undefined) {
+        console.log("going through all handlers")
+        for (var pattern in handlers) {
+          if (handlers.hasOwnProperty(pattern)) {
+            console.log("Checking " + pattern + "...")
+            if (message.text.match(pattern)) {
+              console.log("MATCHED " + pattern + " !")
+              var templateName = handlers[pattern][0]
+              var handler = handlers[pattern][1]
 
-        var outputFileName = __dirname + '/algo.png'
+              var outputFileName = __dirname + '/algo.png' // TODO uuid
+              var text = message.text.substring(message.text.indexOf(':') + 1)
 
-        gm(__dirname + '/template.png')
-        .fontSize(48)
-        .fill("#C63026")
-        .drawText(50, 100, garca.preProcessText(message.text.substring(message.text.indexOf(':') + 1)))
-        .write(outputFileName, function (err) {
-          if (err) 
-            ws.send(JSON.stringify({ channel: message.channel, id: 1, text: "Error: " + JSON.stringify(err) , type: "message" }));
-          else {
-            uploadImage(outputFileName, message)
+              var img = gm(__dirname + '/' + templateName)
+              handler(img, text)
+                .write(outputFileName, function (err) {
+                if (err) 
+                  ws.send(JSON.stringify({ channel: message.channel, id: 1, text: "Error: " + JSON.stringify(err) , type: "message" }));
+                else
+                  uploadImage(outputFileName, message)
+              });
+            }
           }
-        });
-      }
+        }
+      } 
   });
+
+}
+
+function handleGarca(img, text) {
+  return img.fontSize(48)
+    .fill("#C63026")
+    .drawText(50, 100, garca.preProcessText(text, garcaLineLenght))
+}
+
+function handleCronica(img, text) {
+  return img.fontSize(44)
+  .fill("white")
+  .font("FreeMono")
+  .drawText(20, 100, garca.preProcessText(text.toUpperCase(), 18))
 }
 
 function uploadImage(fileName, message) {
     slack.uploadFile({
         file: fs.createReadStream(fileName),
-        title: fileName,
+        title: 'Garca !',
         initialComment: "@sotogarca: " + message.text,
         channels: message.channel
     }, function(err) {
