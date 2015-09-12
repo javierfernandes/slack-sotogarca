@@ -48,9 +48,9 @@ function connectWebSocket(url) {
       if (message.type === 'message' && message.text != undefined) {
         for (var pattern in handlers) {
           if (handlers.hasOwnProperty(pattern)) {
-            console.log("Checking " + pattern + "...")
+            // console.log("Checking " + pattern + "...")
             if (message.text.match(pattern)) {
-              console.log("MATCHED " + pattern + " !")
+              // console.log("MATCHED " + pattern + " !")
               var templateName = handlers[pattern][0]
               var handler = handlers[pattern][1]
 
