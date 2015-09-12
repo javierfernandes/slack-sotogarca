@@ -22,10 +22,8 @@ request(authUrl, function(err, response, body) {
   }
 });
 
-var garcaLineLenght = 28
-
 var handlers = {
-  '^sotogarca:.*' : [ 'garca.png', handleGarca ],
+  '^sotogarca:.*' : [ 'garca.png', handleGarca],
   '^cronica:.*' : ['cronica.png', handleCronica ],
   '^comunicado:.*' : ['comunicado.png', handleComunicado ]
 }
@@ -45,11 +43,9 @@ function connectWebSocket(url) {
   job.start();
 
   ws.on('message', function(message) {
-      console.log('received:', message);
       message = JSON.parse(message);
 
       if (message.type === 'message' && message.text != undefined) {
-        console.log("going through all handlers")
         for (var pattern in handlers) {
           if (handlers.hasOwnProperty(pattern)) {
             console.log("Checking " + pattern + "...")
@@ -78,15 +74,14 @@ function connectWebSocket(url) {
 }
 
 function mollejasPeriodicMessage(ws) {
-  console.log("mollejas message")
-  var elClub = "C02TUBDTL"
-  ws.send(JSON.stringify({ channel: elClub, id: 1, text: "Otro día sin mollejas" , type: "message" }));
+  var channel = "C02TUBDTL" // el club
+  ws.send(JSON.stringify({ channel: channel, id: 1, text: "Otro día sin mollejas :(" , type: "message" }));
 }
 
 function handleGarca(img, text) {
   return img.fontSize(48)
     .fill("#C63026")
-    .drawText(50, 100, garca.preProcessText(text, garcaLineLenght))
+    .drawText(50, 100, garca.preProcessText(text, 28))
 }
 
 function handleCronica(img, text) {
@@ -107,13 +102,14 @@ function uploadImage(fileName, message) {
     slack.uploadFile({
         file: fs.createReadStream(fileName),
         title: 'Garca !',
-        initialComment: "@sotogarca: " + message.text,
+        initialComment: '"' + message.text + '" by ' + message.user,
         channels: message.channel
     }, function(err) {
         if (err) {
             console.error(err); 
         }    
-        else {   
+        else {
+            //todo: delete local file
             console.log('done');   
         }
     });
