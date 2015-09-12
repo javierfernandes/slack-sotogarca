@@ -26,7 +26,8 @@ var garcaLineLenght = 28
 
 var handlers = {
   '^sotogarca:.*' : [ 'garca.png', handleGarca ],
-  '^cronica:.*' : ['cronica.png', handleCronica ]
+  '^cronica:.*' : ['cronica.png', handleCronica ],
+  '^comunicado:.*' : ['comunicado.png', handleComunicado ]
 }
 
 function connectWebSocket(url) {
@@ -35,6 +36,13 @@ function connectWebSocket(url) {
   ws.on('open', function() {
       console.log('Connected');
   });
+
+  var cronJob = require("cron").CronJob;
+  var job = new cronJob("00 30 12 * * 1-5", function() {
+      mollejasPeriodicMessage(ws)
+  }, null, true);
+
+  job.start();
 
   ws.on('message', function(message) {
       console.log('received:', message);
@@ -69,6 +77,12 @@ function connectWebSocket(url) {
 
 }
 
+function mollejasPeriodicMessage(ws) {
+  console.log("mollejas message")
+  var elClub = "C02TUBDTL"
+  ws.send(JSON.stringify({ channel: elClub, id: 1, text: "Otro día sin mollejas" , type: "message" }));
+}
+
 function handleGarca(img, text) {
   return img.fontSize(48)
     .fill("#C63026")
@@ -76,6 +90,13 @@ function handleGarca(img, text) {
 }
 
 function handleCronica(img, text) {
+  return img.fontSize(44)
+  .fill("white")
+  .font("FreeMono")
+  .drawText(20, 100, garca.preProcessText(text.toUpperCase(), 18))
+}
+
+function handleComunicado(img, text) {
   return img.fontSize(44)
   .fill("white")
   .font("FreeMono")
