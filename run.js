@@ -3,6 +3,7 @@ var fs = require('fs');
 var Slack = require('node-slack-upload');
 path = require('path');
 var garca = require('./garca.js');
+var yandex_speech = require('yandex-speech');
 
 console.log("connecting...")
 
@@ -56,7 +57,7 @@ function connectWebSocket(url) {
               var handler = handlers[pattern][1]
 
               var outputFileName = __dirname + '/algo.png' // TODO uuid
-              var text = message.text.substring(message.text.indexOf(':') + 1)
+              var text = parseText(message)
 
               var img = gm(__dirname + '/' + templateName)
               handler(img, text)
@@ -69,9 +70,31 @@ function connectWebSocket(url) {
             }
           }
         }
+
+        if (message.type === 'message' && message.text != undefined && message.text.match(/^tts:.*/)) {
+           textToSpeech(ws, message)
+        }
       } 
   });
 
+}
+
+function parseText(message) {
+  return message.text.substring(message.text.indexOf(':') + 1);
+}
+
+function textToSpeech(ws, message) {
+  var outputFile = 'felizcumple.mp3';
+  var text = parseText(message)
+  console.log("Text to speech: " + text)
+  yandex_speech.TTS({
+      "text": text,
+      "file": outputFile,
+      "lang": 'es_ES'
+      }, function(){
+          uploadImage(outputFile, message)
+      }
+  );
 }
 
 function mollejasPeriodicMessage(ws) {
