@@ -84,7 +84,7 @@ function parseText(message) {
 }
 
 function textToSpeech(ws, message) {
-  var outputFile = 'felizcumple.mp3';
+  var outputFile = __dirname + '/felizcumple.mp3';
   var text = parseText(message)
   console.log("Text to speech: " + text)
   yandex_speech.TTS({
