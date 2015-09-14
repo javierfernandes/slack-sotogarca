@@ -26,7 +26,8 @@ request(authUrl, function(err, response, body) {
 var handlers = {
   '^sotogarca:.*' : [ 'garca.png', handleGarca],
   '^cronica:.*' : ['cronica.png', handleCronica ],
-  '^comunicado:.*' : ['comunicado.png', handleComunicado ]
+  '^comunicado:.*' : ['comunicado.png', handleComunicado ],
+  '^galgo:.*' : ['galgo.png', handleGalgo ]
 }
 
 function connectWebSocket(url) {
@@ -116,6 +117,13 @@ function handleCronica(img, text) {
 }
 
 function handleComunicado(img, text) {
+  return img.fontSize(44)
+  .fill("white")
+  .font("FreeMono")
+  .drawText(20, 100, garca.preProcessText(text.toUpperCase(), 18))
+}
+
+function handleGalgo(img, text) {
   return img.fontSize(44)
   .fill("white")
   .font("FreeMono")
