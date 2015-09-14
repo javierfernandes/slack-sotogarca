@@ -36,7 +36,8 @@ function connectWebSocket(url) {
   });
 
   var cronJob = require("cron").CronJob;
-  var job = new cronJob("00 30 12 * * 1-5", function() {
+  // 15:30 GMT -> 12:30 ARG
+  var job = new cronJob("00 30 15 * * 1-5", function() {
       mollejasPeriodicMessage(ws)
   }, null, true);
 
