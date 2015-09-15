@@ -98,9 +98,18 @@ function textToSpeech(ws, message) {
   );
 }
 
+var frases = [
+  "Otro día sin mollejas :(",
+  "Lindo día para comer mollejas, no?",
+  "Hoy es el día ?  ...... de las mollejas ?",
+  "Huelo a mollejas ?",
+  "Quién trae el limón para las mollejas ?",
+  "Cafe, mollejas\n Ca-fe, mo-lle-jas !"
+]
+
 function mollejasPeriodicMessage(ws) {
   var channel = "C02TUBDTL" // el club
-  ws.send(JSON.stringify({ channel: channel, id: 1, text: "Otro día sin mollejas :(" , type: "message" }));
+  ws.send(JSON.stringify({ channel: channel, id: 1, text: pickRandom(frases), type: "message" }));
 }
 
 function handleGarca(img, text) {
@@ -147,4 +156,8 @@ function uploadImage(fileName, message) {
     });
 }
 
+
+function pickRandom(array) {
+    return array[Math.floor(Math.random() * array.length)]
+}
 
