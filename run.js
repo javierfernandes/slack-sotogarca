@@ -8,10 +8,10 @@ var cronJob = require("cron").CronJob;
 
 var config = JSON.parse(fs.readFileSync(__dirname + '/conf.json', 'utf8'));
 
-console.log("connecting...")
+console.log("connecting with token: " + config.apiToken)
 
 var WebSocket = require('ws'),
-    apiToken = config.apiToken, //Api Token from https://api.slack.com/web (Authentication section)
+    apiToken = config.apiToken,
     authUrl = "https://slack.com/api/rtm.start?token=" + apiToken,
     request = require("request");
 
@@ -40,10 +40,14 @@ function connectWebSocket(url) {
       console.log('Connected');
   });
 
-  // daily message
-  new cronJob("00 30 15 * * 1-5", function() {  // 15:30 GMT -> 12:30 ARG
-      mollejasPeriodicMessage(ws)
-  }, null, true).start();
+
+  // automatic programmed messages
+  config.autoMessages.forEach(function(messageConf) {
+    console.log("Queueing message for channel '" + messageConf + "' and frequency '" + messageConf.cronPattern + "'")
+    new cronJob(messageConf.cronPattern, function() {
+      sendMessage(ws, messageConf)
+    }, null, true).start();  
+  })
 
   // keep presence
   new cronJob("00 */30 * * * *", function() {
@@ -53,6 +57,7 @@ function connectWebSocket(url) {
 
   ws.on('message', function(message) {
       message = JSON.parse(message);
+      console.log("Received " + JSON.stringify(message))
 
       if (message.type === 'message' && message.text != undefined) {
         for (var pattern in handlers) {
@@ -104,18 +109,8 @@ function textToSpeech(ws, message) {
   );
 }
 
-var frases = [
-  "Otro día sin mollejas :(",
-  "Lindo día para comer mollejas, no?",
-  "Hoy es el día ?  ...... de las mollejas ?",
-  "Huelo a mollejas ?",
-  "Quién trae el limón para las mollejas ?",
-  "Cafe, mollejas\n Ca-fe, mo-lle-jas !"
-]
-
-function mollejasPeriodicMessage(ws) {
-  var channel = "C02TUBDTL" // el club
-  ws.send(JSON.stringify({ channel: channel, id: 1, text: pickRandom(frases), type: "message" }));
+function sendMessage(ws, messageConf) {
+  ws.send(JSON.stringify({ channel: messageConf.toChannel, id: 1, text: pickRandom(messageConf.messages), type: "message" }));
 }
 
 function handleGarca(img, text) {

@@ -1,3 +1,18 @@
 {
-	"apiToken" : ""
+	"apiToken" : "",
+
+	"autoMessages" : [
+		{
+			"cronPattern" : "00 */1 * * * *",
+			"toChannel" : "C02TUBDTL",
+			"messages" : [
+  					"Otro día sin mollejas :(",
+  					"Lindo día para comer mollejas, no?",
+  					"Hoy es el día ?  ...... de las mollejas ?",
+  					"Huelo a mollejas ?",
+  					"Quién trae el limón para las mollejas ?",
+  					"Cafe, mollejas Ca-fe, mo-lle-jas !"
+			]
+		}
+	]
 }
