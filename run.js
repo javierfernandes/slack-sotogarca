@@ -4,11 +4,14 @@ var Slack = require('node-slack-upload');
 path = require('path');
 var garca = require('./garca.js');
 var yandex_speech = require('yandex-speech');
+var cronJob = require("cron").CronJob;
+
+var config = JSON.parse(fs.readFileSync(__dirname + '/conf.json', 'utf8'));
 
 console.log("connecting...")
 
 var WebSocket = require('ws'),
-    apiToken = "", //Api Token from https://api.slack.com/web (Authentication section)
+    apiToken = config.apiToken, //Api Token from https://api.slack.com/web (Authentication section)
     authUrl = "https://slack.com/api/rtm.start?token=" + apiToken,
     request = require("request");
 
@@ -24,10 +27,10 @@ request(authUrl, function(err, response, body) {
 });
 
 var handlers = {
-  '^sotogarca:.*' : [ 'garca.png', handleGarca],
-  '^cronica:.*' : ['cronica.png', handleCronica ],
-  '^comunicado:.*' : ['comunicado.png', handleComunicado ],
-  '^galgo:.*' : ['galgo.png', handleGalgo ]
+  '^sotogarca:.*' : [ 'templates/garca.png', handleGarca],
+  '^cronica:.*' : ['templates/cronica.png', handleCronica ],
+  '^comunicado:.*' : ['templates/comunicado.png', handleComunicado ],
+  '^galgo:.*' : ['templates/galgo.png', handleGalgo ]
 }
 
 function connectWebSocket(url) {
@@ -37,13 +40,16 @@ function connectWebSocket(url) {
       console.log('Connected');
   });
 
-  var cronJob = require("cron").CronJob;
-  // 15:30 GMT -> 12:30 ARG
-  var job = new cronJob("00 30 15 * * 1-5", function() {
+  // daily message
+  new cronJob("00 30 15 * * 1-5", function() {  // 15:30 GMT -> 12:30 ARG
       mollejasPeriodicMessage(ws)
-  }, null, true);
+  }, null, true).start();
 
-  job.start();
+  // keep presence
+  new cronJob("00 */30 * * * *", function() {
+      updatePresence(ws)
+  }, null, true).start();
+  
 
   ws.on('message', function(message) {
       message = JSON.parse(message);
@@ -85,14 +91,14 @@ function parseText(message) {
 }
 
 function textToSpeech(ws, message) {
-  var outputFile = __dirname + '/felizcumple.mp3';
+  var outputFile = __dirname + '/tts-out.mp3';
   var text = parseText(message)
-  console.log("Text to speech: " + text)
+
   yandex_speech.TTS({
       "text": text,
       "file": outputFile,
       "lang": 'es_ES'
-      }, function(){
+      }, function() {
           uploadImage(outputFile, message)
       }
   );
@@ -156,8 +162,12 @@ function uploadImage(fileName, message) {
     });
 }
 
-
 function pickRandom(array) {
     return array[Math.floor(Math.random() * array.length)]
+}
+
+function updatePresence(ws) {
+  console.log('Updating presence')
+  ws.send(JSON.stringify({ type : "manual_presence_change", presence: "active"}))
 }
 
