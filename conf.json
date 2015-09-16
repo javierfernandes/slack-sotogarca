@@ -3,7 +3,7 @@
 
 	"autoMessages" : [
 		{
-			"cronPattern" : "00 */1 * * * *",
+			"cronPattern" : "00 30 15 * * 1-5",
 			"toChannel" : "C02TUBDTL",
 			"messages" : [
   					"Otro día sin mollejas :(",
