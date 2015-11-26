@@ -31,7 +31,8 @@ var handlers = {
   '^cronica:.*' : ['templates/cronica.png', handleCronica ],
   '^comunicado:.*' : ['templates/comunicado.png', handleComunicado ],
   '^galgo:.*' : ['templates/galgo.png', handleGalgo ],
-  '^pepito:.*' : ['templates/jp.png', handlePepito ]
+  '^pepito:.*' : ['templates/jp.png', handlePepito ],
+  '^javalopez:.*' : ['templates/javalopez.png', handleJavaLopez ]
 }
 
 function connectWebSocket(url) {
@@ -144,7 +145,22 @@ function handleGalgo(img, text) {
 function handlePepito(img, text) {
   return img.fontSize(44)
   .fill("black")
-  .drawText(220, 355, garca.preProcessText(text, 13))
+  .drawText(220, 355, garca.preProcessText(text, 8))
+}
+
+function handleJavaLopez(img, text) {
+  return img.fontSize(66)
+    .fill("white")
+    .drawText(70, 120, garca.preProcessText(text, 20))
+}
+
+function fontSizeFor(text) {
+  if (text.length <= 7)
+    return 13
+  else if (text.length <= 20)
+    return 8
+  else
+    return 6
 }
 
 function uploadImage(fileName, message) {
