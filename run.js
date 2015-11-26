@@ -151,7 +151,7 @@ function handlePepito(img, text) {
 function handleJavaLopez(img, text) {
   return img.fontSize(66)
     .fill("white")
-    .drawText(70, 120, garca.preProcessText(text, 20))
+    .drawText(70, 120, garca.preProcessText("Aguante " + text, 20))
 }
 
 function fontSizeFor(text) {
