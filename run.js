@@ -152,9 +152,11 @@ function handlePepito(img, text) {
 }
 
 function handleJavaLopez(img, text) {
-  return img.fontSize(66)
+  return img.fontSize(120)
     .fill("white")
-    .drawText(70, 120, garca.preProcessText("Aguante " + text, 20))
+    .drawText(80, 160, "Aguante")
+    .fontSize(140)
+    .drawText(60, 300, garca.preProcessText(text, 20))
 }
 
 function handleFracasado(img, text) {
