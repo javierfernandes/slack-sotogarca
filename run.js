@@ -32,7 +32,8 @@ var handlers = {
   '^comunicado:.*' : ['templates/comunicado.png', handleComunicado ],
   '^galgo:.*' : ['templates/galgo.png', handleGalgo ],
   '^pepito:.*' : ['templates/jp.png', handlePepito ],
-  '^javalopez:.*' : ['templates/javalopez.png', handleJavaLopez ]
+  '^javalopez:.*' : ['templates/javalopez.png', handleJavaLopez ],
+  '^fracasado:.*' : ['templates/fracasado.png', handleFracasado ]
 }
 
 function connectWebSocket(url) {
@@ -44,12 +45,14 @@ function connectWebSocket(url) {
 
 
   // automatic programmed messages
-  config.autoMessages.forEach(function(messageConf) {
-    console.log("Queueing message for channel '" + messageConf + "' and frequency '" + messageConf.cronPattern + "'")
-    new cronJob(messageConf.cronPattern, function() {
-      sendMessage(ws, messageConf)
-    }, null, true).start();  
-  })
+  if (config.autoMessages) {
+    config.autoMessages.forEach(function(messageConf) {
+      console.log("Queueing message for channel '" + messageConf + "' and frequency '" + messageConf.cronPattern + "'")
+      new cronJob(messageConf.cronPattern, function() {
+        sendMessage(ws, messageConf)
+      }, null, true).start();  
+    })
+  }
 
   // keep presence
   new cronJob("00 */30 * * * *", function() {
@@ -152,6 +155,17 @@ function handleJavaLopez(img, text) {
   return img.fontSize(66)
     .fill("white")
     .drawText(70, 120, garca.preProcessText("Aguante " + text, 20))
+}
+
+function handleFracasado(img, text) {
+  var x = 30
+  var y = 222
+  var i = img.fontSize(44)
+    .fill("gray")
+    .drawText(x, y, garca.preProcessText(text, 8))
+  return i.fontSize(44)
+    .fill("orange")
+    .drawText(x - 2, y - 3, garca.preProcessText(text, 8))  
 }
 
 function fontSizeFor(text) {
