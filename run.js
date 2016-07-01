@@ -34,7 +34,8 @@ var handlers = {
   '^pepito:.*' : ['templates/jp.png', handlePepito ],
   '^javalopez:.*' : ['templates/javalopez.png', handleJavaLopez ],
   '^fracasado:.*' : ['templates/fracasado.png', handleFracasado ],
-  '^borges:.*' : ['templates/borges.png', handleBorges ]
+  '^borges:.*' : ['templates/borges.png', handleBorges ],
+  '^sinasado:.*' : ['templates/sinasado.png', handleSinAsado ]
 }
 
 function connectWebSocket(url) {
@@ -164,6 +165,12 @@ function handleBorges(img, text) {
   return img.fontSize(55)
     .fill("white")
     .drawText(80, 350, garca.preProcessText('"' + text + '"\n Jorge Luis Borges', 34))
+}
+
+function handleSinAsado(img, text) {
+  return img.fontSize(55)
+    .fill("black")
+    .drawText(25, 118, text)
 }
 
 function handleFracasado(img, text) {
