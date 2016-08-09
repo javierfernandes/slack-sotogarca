@@ -3,6 +3,10 @@ var fs = require('fs');
 var Slack = require('node-slack-upload');
 path = require('path');
 var garca = require('./garca.js');
+var http = require('http');
+var url = require("url");
+var Q = require('q')
+
 var yandex_speech = require('yandex-speech');
 var cronJob = require("cron").CronJob;
 
@@ -35,7 +39,8 @@ var handlers = {
   '^javalopez:.*' : ['templates/javalopez.png', handleJavaLopez ],
   '^fracasado:.*' : ['templates/fracasado.png', handleFracasado ],
   '^borges:.*' : ['templates/borges.png', handleBorges ],
-  '^sinasado:.*' : ['templates/sinasado.png', handleSinAsado ]
+  '^sinasado:.*' : ['templates/sinasado.png', handleSinAsado ],
+  '^vaf:.*' : ['templates/vaf-fondo.png', handleVaf ]
 }
 
 function connectWebSocket(url) {
@@ -79,13 +84,18 @@ function connectWebSocket(url) {
               var text = parseText(message)
 
               var img = gm(__dirname + '/' + templateName)
-              handler(img, text)
-                .write(outputFileName, function (err) {
-                if (err) 
+              var returnValue = handler(img, text)
+              Q(returnValue).then(function(value) {
+                value.write(outputFileName, function (err) {
+                    if (err)
+                        ws.send(JSON.stringify({ channel: message.channel, id: 1, text: "Error: " + JSON.stringify(err) , type: "message" }));
+                    else
+                        uploadImage(outputFileName, message)
+                });
+              })
+              .catch(function(err) {
                   ws.send(JSON.stringify({ channel: message.channel, id: 1, text: "Error: " + JSON.stringify(err) , type: "message" }));
-                else
-                  uploadImage(outputFileName, message)
-              });
+              })
             }
           }
         }
@@ -172,6 +182,62 @@ function handleSinAsado(img, text) {
     .fill("black")
     .drawText(25, 118, text)
 }
+
+function handleVaf(img, text) {
+    var fileUrl = text.replace('<','').replace('>','')
+    var parsed = url.parse(fileUrl);
+    var fileName = path.basename(parsed.pathname)
+
+    var tempFileName = __dirname + "/temp/" + fileName
+    return download(fileUrl, tempFileName).then(function() {
+        try {
+            return sizeOfImage(img).then(function(size) {
+                return gm(tempFileName)
+                    .resize(size.width, size.height, "!")
+                    .composite(__dirname + '/templates/vaf-fondo.png')
+            })
+        }
+        catch (ex) {
+            console.log(ex, ex.stack.split("\n"))
+            throw ex;
+        }
+    }).catch(function(err) {
+        console.log(err, err.stack.split("\n"))
+        console.error("Error while downloading", err)
+        return img.fontSize(55)
+            .fill("black")
+            .drawText(25, 118, "ERROR: " + err)
+    })
+}
+
+function sizeOfImage(img) {
+    var d = Q.defer()
+    img.size(function (err, size) {
+        if (err) {
+            d.reject(err)
+        }
+        else {
+            d.resolve(size)
+        }
+    });
+    return d.promise
+}
+
+function download(url, dest) {
+    var d = Q.defer()
+    var file = fs.createWriteStream(dest);
+    var request = http.get(url, function(response) {
+        response.pipe(file);
+        file.on('finish', function() {
+            d.resolve()
+        });
+    }).on('error', function(err) { // Handle errors
+        console.error("Error downloading file " + url, err)
+        fs.unlink(dest); // Delete the file async. (But we don't check the result)
+        if (cb) d.reject(err.message)
+    });
+    return d.promise
+};
 
 function handleFracasado(img, text) {
   var x = 30
