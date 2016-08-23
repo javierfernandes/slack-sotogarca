@@ -40,7 +40,8 @@ var handlers = {
   '^fracasado:.*' : ['templates/fracasado.png', handleFracasado ],
   '^borges:.*' : ['templates/borges.png', handleBorges ],
   '^sinasado:.*' : ['templates/sinasado.png', handleSinAsado ],
-  '^vaf:.*' : ['templates/vaf-fondo.png', handleVaf ]
+  '^vaf:.*' : ['templates/vaf-fondo.png', handleVaf1 ],
+  '^vaf2:.*' : ['templates/vaf2.png', handleVaf2 ]
 }
 
 function connectWebSocket(url) {
@@ -183,7 +184,13 @@ function handleSinAsado(img, text) {
     .drawText(25, 118, text)
 }
 
-function handleVaf(img, text) {
+function handleVaf1(img, text) {
+	return handleVaf(img, text, '/templates/vaf-fondo.png')
+}
+function handleVaf2(img,text) {
+	return handleVaf(img, text, '/templates/vaf2.png')
+} 
+function handleVaf(img, text, templateName) {
     var fileUrl = text.replace('<','').replace('>','')
     var parsed = url.parse(fileUrl);
     var fileName = path.basename(parsed.pathname)
@@ -194,7 +201,7 @@ function handleVaf(img, text) {
             return sizeOfImage(img).then(function(size) {
                 return gm(tempFileName)
                     .resize(size.width, size.height, "!")
-                    .composite(__dirname + '/templates/vaf-fondo.png')
+                    .composite(__dirname + templateName)
             })
         }
         catch (ex) {
