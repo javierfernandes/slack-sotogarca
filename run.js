@@ -4,6 +4,7 @@ var Slack = require('node-slack-upload');
 path = require('path');
 var garca = require('./garca.js');
 var http = require('http');
+var https = require('https');
 var url = require("url");
 var Q = require('q')
 
@@ -41,7 +42,8 @@ var handlers = {
   '^borges:.*' : ['templates/borges.png', handleBorges ],
   '^sinasado:.*' : ['templates/sinasado.png', handleSinAsado ],
   '^vaf:.*' : ['templates/vaf-fondo.png', handleVaf1 ],
-  '^vaf2:.*' : ['templates/vaf2.png', handleVaf2 ]
+  '^vaf2:.*' : ['templates/vaf2.png', handleVaf2 ],
+  '^snake:.*' : ['templates/snake.png', handleSnake ]
 }
 
 function connectWebSocket(url) {
@@ -190,6 +192,9 @@ function handleVaf1(img, text) {
 function handleVaf2(img,text) {
 	return handleVaf(img, text, '/templates/vaf2.png')
 } 
+function handleSnake(img,text) {
+	return handleVaf(img, text, '/templates/snake.png')
+}
 function handleVaf(img, text, templateName) {
     var fileUrl = text.replace('<','').replace('>','')
     var parsed = url.parse(fileUrl);
@@ -233,7 +238,7 @@ function sizeOfImage(img) {
 function download(url, dest) {
     var d = Q.defer()
     var file = fs.createWriteStream(dest);
-    var request = http.get(url, function(response) {
+    var request = (url.indexOf('https') == 0 ? https : http).get(url, function(response) {
         response.pipe(file);
         file.on('finish', function() {
             d.resolve()
