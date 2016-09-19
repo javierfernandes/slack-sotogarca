@@ -41,9 +41,12 @@ var handlers = {
   '^fracasado:.*' : ['templates/fracasado.png', handleFracasado ],
   '^borges:.*' : ['templates/borges.png', handleBorges ],
   '^sinasado:.*' : ['templates/sinasado.png', handleSinAsado ],
-  '^vaf:.*' : ['templates/vaf-fondo.png', handleVaf1 ],
-  '^vaf2:.*' : ['templates/vaf2.png', handleVaf2 ],
-  '^snake:.*' : ['templates/snake.png', handleSnake ]
+
+  // selfies
+  '^vaf:.*' : ['templates/vaf-fondo.png', selfie('vaf1') ],
+  '^vaf2:.*' : ['templates/vaf2.png', selfie('vaf2') ],
+  '^snake:.*' : ['templates/snake.png', selfie('snake') ],
+  '^jpipita:.*' : ['templates/snake.png', selfie('jpipita') ]
 }
 
 function connectWebSocket(url) {
@@ -109,6 +112,13 @@ function connectWebSocket(url) {
       } 
   });
 
+}
+
+var uploadRegExp = /^uploadSelfie\:.*/
+
+function isSelfieUpload(message) {
+    return (message.type === "file_created" ||
+        message.type === "file_shared" ) && message.file.title.match(uploadRegExp)
 }
 
 function parseText(message) {
@@ -186,16 +196,13 @@ function handleSinAsado(img, text) {
     .drawText(25, 118, text)
 }
 
-function handleVaf1(img, text) {
-	return handleVaf(img, text, '/templates/vaf-fondo.png')
+function selfie(templateFileName) {
+    return function(img, text) {
+        return handleSelfie(img, text, '/templates/' + templateFileName + '.png')
+    }
 }
-function handleVaf2(img,text) {
-	return handleVaf(img, text, '/templates/vaf2.png')
-} 
-function handleSnake(img,text) {
-	return handleVaf(img, text, '/templates/snake.png')
-}
-function handleVaf(img, text, templateName) {
+
+function handleSelfie(img, text, templateName) {
     var fileUrl = text.replace('<','').replace('>','')
     var parsed = url.parse(fileUrl);
     var fileName = path.basename(parsed.pathname)
