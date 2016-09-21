@@ -46,7 +46,8 @@ var handlers = {
   '^vaf:.*' : ['templates/vaf-fondo.png', selfie('vaf1') ],
   '^vaf2:.*' : ['templates/vaf2.png', selfie('vaf2') ],
   '^snake:.*' : ['templates/snake.png', selfie('snake') ],
-  '^jpipita:.*' : ['templates/snake.png', selfie('jpipita') ]
+  '^jpipita:.*' : ['templates/jpipita.png', selfie('jpipita') ],
+  '^paltabostero:.*' : ['templates/paltabostero.png', selfie('paltabostero') ]
 }
 
 function connectWebSocket(url) {
