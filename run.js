@@ -50,6 +50,13 @@ var handlers = {
   '^paltabostero:.*' : ['templates/paltabostero.png', selfie('paltabostero') ]
 }
 
+registerSelfie('ger')
+
+function registerSelfie(fileName) {
+  handlers['^' + fileName + ':.*'] = ['templates/' + fileName + '.png', selfie(fileName) ]
+}
+
+
 function connectWebSocket(url) {
   var ws = new WebSocket(url);
 
