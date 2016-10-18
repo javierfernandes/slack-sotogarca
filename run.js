@@ -37,6 +37,7 @@ var handlers = {
   '^comunicado:.*' : ['templates/comunicado.png', handleComunicado ],
   '^galgo:.*' : ['templates/galgo.png', handleGalgo ],
   '^pepito:.*' : ['templates/jp.png', handlePepito ],
+  '^jpuber:.*' : ['templates/jppuber.png', handleJPPuber ],
   '^javalopez:.*' : ['templates/javalopez.png', handleJavaLopez ],
   '^fracasado:.*' : ['templates/fracasado.png', handleFracasado ],
   '^borges:.*' : ['templates/borges.png', handleBorges ],
@@ -183,6 +184,13 @@ function handlePepito(img, text) {
   return img.fontSize(44)
   .fill("black")
   .drawText(220, 355, garca.preProcessText(text, 8))
+}
+
+
+function handleJPPuber(img, text) {
+  return img.fontSize(44)
+  .fill("white")
+  .drawText(100, 475, garca.preProcessText(text, 40))
 }
 
 function handleJavaLopez(img, text) {
