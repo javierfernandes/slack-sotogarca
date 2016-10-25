@@ -53,6 +53,7 @@ var handlers = {
 
 registerSelfie('ger')
 registerSelfie('soto-acostado')
+registerSelfie('migue')
 
 function registerSelfie(fileName) {
   handlers['^' + fileName + ':.*'] = ['templates/' + fileName + '.png', selfie(fileName) ]
@@ -215,7 +216,8 @@ function handleSinAsado(img, text) {
 
 function selfie(templateFileName) {
     return function(img, text) {
-        return handleSelfie(img, text, '/templates/' + templateFileName + '.png')
+        var outImg = handleSelfie(img, text, '/templates/' + templateFileName + '.png')
+	return outImg
     }
 }
 
