@@ -54,6 +54,7 @@ var handlers = {
 registerSelfie('ger')
 registerSelfie('soto-acostado')
 registerSelfie('migue')
+registerSelfie('trioavion')
 
 function registerSelfie(fileName) {
   handlers['^' + fileName + ':.*'] = ['templates/' + fileName + '.png', selfie(fileName) ]
