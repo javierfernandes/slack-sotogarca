@@ -42,6 +42,7 @@ var handlers = {
   '^fracasado:.*' : ['templates/fracasado.png', handleFracasado ],
   '^borges:.*' : ['templates/borges.png', handleBorges ],
   '^sinasado:.*' : ['templates/sinasado.png', handleSinAsado ],
+  '^thinking:.*': ['templates/thinking.png', handleThinking ],
 
   // selfies
   '^vaf:.*' : ['templates/vaf-fondo.png', selfie('vaf1') ],
@@ -213,6 +214,12 @@ function handleSinAsado(img, text) {
   return img.fontSize(55)
     .fill("black")
     .drawText(25, 118, text)
+}
+
+function handleThinking(img, text) {
+  return img.fontSize(38)
+    .fill("white")
+    .drawText(298, 55, garca.preProcessText(text, 18))
 }
 
 function selfie(templateFileName) {
