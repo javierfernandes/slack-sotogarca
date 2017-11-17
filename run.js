@@ -57,6 +57,7 @@ registerSelfie('soto-acostado')
 registerSelfie('migue')
 registerSelfie('trioavion')
 registerSelfie('ema')
+registerSelfie('demian')
 
 function registerSelfie(fileName) {
   handlers['^' + fileName + ':.*'] = ['templates/' + fileName + '.png', selfie(fileName) ]
@@ -273,7 +274,7 @@ function sizeOfImage(img) {
 function download(url, dest) {
     var d = Q.defer()
     var file = fs.createWriteStream(dest);
-    var request = (url.indexOf('https') == 0 ? https : http).get(url, function(response) {
+    var request = (url.indexOf('https') >= 0 ? https : http).get(url, function(response) {
         response.pipe(file);
         file.on('finish', function() {
             d.resolve()
